@@ -1,0 +1,2 @@
+$HOME/go/bin/fyne bundle MPLUSRounded1c-Regular.ttf > bundle.go
+$HOME/go/bin/fyne bundle -append MPLUSRounded1c-Bold.ttf >> bundle.go
