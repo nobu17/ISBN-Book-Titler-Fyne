@@ -1,6 +1,7 @@
 package guis
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 
@@ -24,10 +25,7 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 	title.TextStyle = fyne.TextStyle{Bold: true}
 
 	// caption := widget.NewLabel("Settingsタブの内容でテストを行います。\nGSやZbarのパスが正しく設定されているか確認できます。\nStart Testボタンを押すと下記のパスにあるファイルから画像を取り出して書籍情報を取得します。\n1:ファイルを差し替えれば自分のファイルでも確認可能です。\n2:Saveボタンを押していない設定は使用されません。\n" + TestFilePath)
-	// caption := widget.NewLabel("aaa")
 	captions := createCaption()
-	// caption.Wrapping = fyne.TextWrapWord
-	//caption.Alignment = fyne.TextAlignLeading
 
 	bookmsg := ""
 	bookbind := binding.BindString(&bookmsg)
@@ -56,7 +54,8 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 			errorLabel.Text = "failed to read book info." + err.Error()
 			return
 		}
-		bookbind.Set(getBookDisplayInfo(book))
+		resultStr := fmt.Sprintf("使用サービス:%s\n",appsetting.BookReader)
+		bookbind.Set(resultStr + getBookDisplayInfo(book))
 	})
 
 	return container.NewVBox(
