@@ -16,7 +16,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const TestFilePath = "./samples/test.pdf"
+const TestPDFFilePath = "./samples/test.pdf"
+const TestZIPFilePath = "./samples/test.zip"
 
 func GetTestContent(w *fyne.Window) *fyne.Container {
 
@@ -36,7 +37,9 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 	red := color.NRGBA{R: 0xff, G: 0x33, B: 0x33, A: 0xff}
 	errorLabel := canvas.NewText("", red)
 
-	testButton := widget.NewButton("Start Test", func() {
+	testFunc := func (filePath string)  {
+		errorLabel.Text = ""
+
 		rulesetting := settings.NewRuleSettings()
 		rulesetting.Init()
 
@@ -49,19 +52,27 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 
 		bookbind.Set("")
 		flow := workflows.NewRenameByBookInfoWorkflow(appsetting, rulesetting)
-		book, err := flow.TestGetBookInfo(TestFilePath)
+		book, err := flow.TestGetBookInfo(filePath)
 		if err != nil {
 			errorLabel.Text = "failed to read book info." + err.Error()
 			return
 		}
 		resultStr := fmt.Sprintf("使用サービス:%s\n",appsetting.BookReader)
-		bookbind.Set(resultStr + getBookDisplayInfo(book))
+		bookbind.Set(resultStr + getBookDisplayInfo(book))		
+	}
+
+	testPdfButton := widget.NewButton("Start Test(PDF)", func() {
+		testFunc(TestPDFFilePath)
+	})
+	testZipButton := widget.NewButton("Start Test(Zip)", func() {
+		testFunc(TestZIPFilePath)
 	})
 
 	return container.NewVBox(
 		title,
 		captions,
-		testButton,
+		testPdfButton,
+		testZipButton,
 		errorLabel,
 		bookLabel,
 	)
@@ -71,7 +82,8 @@ func createCaption() *fyne.Container {
 	captions := container.NewVBox(
 		widget.NewLabel("Settingsタブの内容でテストを行います。(Saveボタンを押していない設定は使用されません。)"),
 		widget.NewLabel("GSやZbarのパスが正しく設定されているか確認できます。"),
-		widget.NewLabel("ファイルを差し替えれば自分のファイルでも確認可能です。"+TestFilePath),
+		widget.NewLabel("ファイルを差し替えれば自分のファイルでも確認可能です。"),
+		widget.NewLabel("PDF:  "+TestPDFFilePath+ "    Zip:  " + TestZIPFilePath),
 	)
 	return captions
 }

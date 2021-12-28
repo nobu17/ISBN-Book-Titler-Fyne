@@ -33,21 +33,10 @@ func NewRenameByBookInfoWorkflow(app *settings.AppSettings, rule *settings.RuleS
 }
 
 func (w *RenameByBookInfoWorkflow) RenameFileByIsbn(path string) *WorkFlowResult {
-	if err := w.appSettings.Validate(); err != nil {
-		errmsg := "appsetting is incorect"
-		logger.Error(errmsg, err)
-		return &WorkFlowResult{"", path, errmsg, err}
-	}
-	if err := w.ruleSetings.Validate(); err != nil {
-		errmsg := "ruleSetings is incorect"
-		logger.Error(errmsg, err)
-		return &WorkFlowResult{"", path, errmsg, err}
+	if preResult := w.preCheck(path); preResult != nil {
+		return preResult
 	}
 
-	if !w.isFileExists(path) {
-		logger.Error("file is not exists", nil)
-		return &WorkFlowResult{"", path, "file is not exists", fmt.Errorf("file is not exists")}
-	}
 	isbnflow := isbn.NewIsbnGetWorkFlow(w.appSettings)
 	isbn13, err := isbnflow.GetIsbn(path, int(w.appSettings.GetPagesInt()))
 	if err != nil {
@@ -70,8 +59,8 @@ func (w *RenameByBookInfoWorkflow) RenameFileByIsbn(path string) *WorkFlowResult
 }
 
 func (w *RenameByBookInfoWorkflow) TestGetBookInfo(path string) (*book.BookInfo, error) {
-	if !w.isFileExists(path) {
-		return nil, fmt.Errorf("file is not exists")
+	if preResult := w.preCheck(path); preResult != nil {
+		return nil, preResult.Error
 	}
 	isbnflow := isbn.NewIsbnGetWorkFlow(w.appSettings)
 	isbn13, err := isbnflow.GetIsbn(path, int(w.appSettings.GetPagesInt()))
@@ -80,6 +69,25 @@ func (w *RenameByBookInfoWorkflow) TestGetBookInfo(path string) (*book.BookInfo,
 	}
 
 	return book.GetBookInfo(isbn13, w.appSettings)
+}
+
+func (w *RenameByBookInfoWorkflow) preCheck(path string) *WorkFlowResult {
+	if err := w.appSettings.Validate(); err != nil {
+		errmsg := "appsetting is incorect"
+		logger.Error(errmsg, err)
+		return &WorkFlowResult{"", path, errmsg, err}
+	}
+	if err := w.ruleSetings.Validate(); err != nil {
+		errmsg := "ruleSetings is incorect"
+		logger.Error(errmsg, err)
+		return &WorkFlowResult{"", path, errmsg, err}
+	}
+
+	if !w.isFileExists(path) {
+		logger.Error("file is not exists", nil)
+		return &WorkFlowResult{"", path, "file is not exists", fmt.Errorf("file is not exists")}
+	}
+	return nil
 }
 
 func (w *RenameByBookInfoWorkflow) isFileExists(path string) bool {
