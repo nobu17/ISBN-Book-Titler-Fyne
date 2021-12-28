@@ -108,6 +108,6 @@ func main() {
 		dialog.ShowInformation("error", "有効なファイルがありませんでした。", w)
 	}
 
-	w.Resize(fyne.NewSize(900, 500))
+	w.Resize(fyne.NewSize(900, 600))
 	w.ShowAndRun()
 }
