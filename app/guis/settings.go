@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -94,12 +95,27 @@ func makePageSelect(setting *settings.AppSettings) *widget.Select {
 	return sel
 }
 
-func makeReaderSelect(setting *settings.AppSettings) *widget.Select {
-	binding := binding.BindString(&setting.BookReader)
+func makeReaderSelect(setting *settings.AppSettings) *fyne.Container {
+	readerBind := binding.BindString(&setting.BookReader)
 	selectables := setting.GetSelectableReader()
-	sel := widget.NewSelect(selectables, func(s string) {
-		binding.Set(s)
+	rakutenApikeyBinding := binding.BindString(&setting.RakutenApiKey)
+
+	var sel *widget.Select
+	var allContents *fyne.Container
+	sel = widget.NewSelect(selectables, func(s string) {
+		readerBind.Set(s)
+		if s == settings.RakutenBook.String() {
+			entry := widget.NewEntryWithData(rakutenApikeyBinding)
+			label := widget.NewLabel("API Key:")
+			content := container.New(layout.NewBorderLayout(nil, nil, label, nil),
+			label, entry)
+			allContents.Add(content)
+		}
 	})
+
+	allContents = container.NewVBox(sel)
+
+
 	sel.SetSelected(setting.BookReader)
-	return sel
+	return allContents
 }

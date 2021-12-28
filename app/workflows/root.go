@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"isbnbook/app/settings"
 	"isbnbook/app/log"
+	"isbnbook/app/settings"
 	"isbnbook/app/workflows/book"
 	"isbnbook/app/workflows/isbn"
 	"isbnbook/app/workflows/rename"
@@ -33,6 +33,17 @@ func NewRenameByBookInfoWorkflow(app *settings.AppSettings, rule *settings.RuleS
 }
 
 func (w *RenameByBookInfoWorkflow) RenameFileByIsbn(path string) *WorkFlowResult {
+	if err := w.appSettings.Validate(); err != nil {
+		errmsg := "appsetting is incorect"
+		logger.Error(errmsg, err)
+		return &WorkFlowResult{"", path, errmsg, err}
+	}
+	if err := w.ruleSetings.Validate(); err != nil {
+		errmsg := "ruleSetings is incorect"
+		logger.Error(errmsg, err)
+		return &WorkFlowResult{"", path, errmsg, err}
+	}
+
 	if !w.isFileExists(path) {
 		logger.Error("file is not exists", nil)
 		return &WorkFlowResult{"", path, "file is not exists", fmt.Errorf("file is not exists")}

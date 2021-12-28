@@ -9,20 +9,22 @@ import (
 const AppSettingPath = "./app_setting.json"
 
 type AppSettings struct {
-	GSPath       string `json:"gsPath"`
-	ZBarPath     string `json:"zbarPath"`
-	ExtractPages string `json:"extractPages"`
-	BookReader   string `json:"bookReader"`
-	json         *JsonSettings
+	GSPath        string `json:"gsPath"`
+	ZBarPath      string `json:"zbarPath"`
+	ExtractPages  string `json:"extractPages"`
+	BookReader    string `json:"bookReader"`
+	RakutenApiKey string `json:"rakutenApiKey"`
+	json          *JsonSettings
 }
 
 func NewAppSetings() *AppSettings {
 	return &AppSettings{
-		GSPath:       "gs",
-		ZBarPath:     "zbarimg",
-		ExtractPages: "5",
-		BookReader:   OpenBD.String(),
-		json:         NewJsonSettings(AppSettingPath),
+		GSPath:        "gs",
+		ZBarPath:      "zbarimg",
+		ExtractPages:  "5",
+		BookReader:    OpenBD.String(),
+		RakutenApiKey: "",
+		json:          NewJsonSettings(AppSettingPath),
 	}
 }
 
@@ -31,6 +33,7 @@ type BookInfoReaderType int
 const (
 	OpenBD BookInfoReaderType = iota
 	NationalLib
+	RakutenBook
 )
 
 func (b BookInfoReaderType) String() string {
@@ -39,13 +42,15 @@ func (b BookInfoReaderType) String() string {
 		return "OpenBD"
 	case NationalLib:
 		return "国会図書館"
+	case RakutenBook:
+		return "楽天ブックAPI"
 	default:
 		return "Unknown"
 	}
 }
 
 func (a *AppSettings) Init() {
-	loaded := AppSettings{}
+	loaded := NewAppSetings()
 	if err := a.json.Load(&loaded); err != nil {
 		logger.Error("load json is failed.", err)
 		// works as default value
@@ -55,6 +60,7 @@ func (a *AppSettings) Init() {
 	a.ZBarPath = loaded.ZBarPath
 	a.ExtractPages = loaded.ExtractPages
 	a.BookReader = loaded.BookReader
+	a.RakutenApiKey = loaded.RakutenApiKey
 }
 
 func (a *AppSettings) SaveSetting() error {
@@ -89,6 +95,13 @@ func (a *AppSettings) Validate() error {
 		return errors.New(msg)
 	}
 
+	if a.BookReader == RakutenBook.String() {
+		if strings.TrimSpace(a.RakutenApiKey) == "" {
+			msg = "rakuten API is needed apikey"
+			return errors.New(msg)
+		}
+	}
+
 	return nil
 }
 
@@ -107,5 +120,5 @@ func (a *AppSettings) GetSelectablePages() []string {
 }
 
 func (a *AppSettings) GetSelectableReader() []string {
-	return []string{OpenBD.String(), NationalLib.String()}
+	return []string{OpenBD.String(), NationalLib.String(), RakutenBook.String()}
 }

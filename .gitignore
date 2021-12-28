@@ -23,5 +23,7 @@ samples/
 *.pdf
 *.zip
 
+app_setting.json
+
 temp_work/*
 !.gitkeep
