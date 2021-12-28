@@ -80,11 +80,10 @@ func NewRakutenReader(apikey string) *rakutenReader {
 	}
 }
 
-
 func (r *rakutenReader) GetBookInfo(isbn13 string) (*BookInfo, error) {
 	params := map[string]string{
-		"format": "json",
-		"isbn": isbn13,
+		"format":        "json",
+		"isbn":          isbn13,
 		"applicationId": r.apikey,
 	}
 	byteArray, err := r.client.Get("/BooksBook/Search/20170404", params)
@@ -98,7 +97,6 @@ func (r *rakutenReader) GetBookInfo(isbn13 string) (*BookInfo, error) {
 	}
 	return r.getBookInfoFromRakutenData(data)
 }
-
 
 func (r *rakutenReader) getBookInfoFromRakutenData(data *rakutenData) (*BookInfo, error) {
 	if data.Count == 0 || len(data.Items) == 0 {
@@ -115,6 +113,7 @@ func (r *rakutenReader) getBookInfoFromRakutenData(data *rakutenData) (*BookInfo
 	pubdate = strings.Replace(pubdate, "月", "-", -1)
 	pubdate = strings.Replace(pubdate, "日", "-", -1)
 	pubdate = strings.Replace(pubdate, "頃", "", -1)
+	pubdate = strings.TrimSuffix(pubdate, "-")
 
 	authors := strings.Split(item.Author, "/")
 
@@ -139,11 +138,10 @@ func (r *rakutenReader) getGenreString(genreCodeStr string) string {
 	return data.Current.BooksGenreName
 }
 
-
 func (r *rakutenReader) getGenre(genreCode string) (*rakutenGenreData, error) {
 	params := map[string]string{
-		"format": "json",
-		"booksGenreId": genreCode,
+		"format":        "json",
+		"booksGenreId":  genreCode,
 		"applicationId": r.apikey,
 	}
 	byteArray, err := r.client.Get("/BooksGenre/Search/20121128", params)
