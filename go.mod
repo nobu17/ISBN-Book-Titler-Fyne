@@ -5,6 +5,9 @@ go 1.17
 require fyne.io/fyne/v2 v2.1.1
 
 require (
+	github.com/spiegel-im-spiegel/errs v1.0.5 // indirect
+	github.com/spiegel-im-spiegel/fetch v0.2.5 // indirect
+	github.com/spiegel-im-spiegel/pa-api v0.10.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect

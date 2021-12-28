@@ -98,24 +98,72 @@ func makePageSelect(setting *settings.AppSettings) *widget.Select {
 func makeReaderSelect(setting *settings.AppSettings) *fyne.Container {
 	readerBind := binding.BindString(&setting.BookReader)
 	selectables := setting.GetSelectableReader()
-	rakutenApikeyBinding := binding.BindString(&setting.RakutenApiKey)
+
+	rakutenEntry := makeRakutenAPIEntry(setting)
+	rakutenEntry.Hidden = true
+
+	amazonPAEntry := makeAmazonPAEntry(setting)
+	amazonPAEntry.Hidden = true
 
 	var sel *widget.Select
 	var allContents *fyne.Container
 	sel = widget.NewSelect(selectables, func(s string) {
 		readerBind.Set(s)
 		if s == settings.RakutenBook.String() {
-			entry := widget.NewEntryWithData(rakutenApikeyBinding)
-			label := widget.NewLabel("API Key:")
-			content := container.New(layout.NewBorderLayout(nil, nil, label, nil),
-			label, entry)
-			allContents.Add(content)
+			rakutenEntry.Hidden = false
+		} else {
+			rakutenEntry.Hidden = true
 		}
+		if s == settings.AmazonPA.String() {
+			amazonPAEntry.Hidden = false
+		} else {
+			amazonPAEntry.Hidden = true
+		}
+		rakutenEntry.Refresh()
+		amazonPAEntry.Refresh()
+		allContents.Refresh()
 	})
 
 	allContents = container.NewVBox(sel)
-
+	allContents.Add(rakutenEntry)
+	allContents.Add(amazonPAEntry)
 
 	sel.SetSelected(setting.BookReader)
 	return allContents
+}
+
+func makeRakutenAPIEntry(setting *settings.AppSettings) *fyne.Container {
+	rakutenApikeyBinding := binding.BindString(&setting.RakutenApiKey)
+	entry := widget.NewEntryWithData(rakutenApikeyBinding)
+	label := widget.NewLabel("API Key:")
+	content := container.New(layout.NewBorderLayout(nil, nil, label, nil),
+		label, entry)
+
+	return container.NewVBox(content)
+}
+
+func makeAmazonPAEntry(setting *settings.AppSettings) *fyne.Container {
+	paAssociateIdBinding := binding.BindString(&setting.AmazonPASettings.AssociateId)
+	paAccessKeyBinding := binding.BindString(&setting.AmazonPASettings.AccessKey)
+	paSecKeyBinding := binding.BindString(&setting.AmazonPASettings.SecretKey)
+
+	identry := widget.NewEntryWithData(paAssociateIdBinding)
+	idlabel := widget.NewLabel("AssociateId:")
+	idcontent := container.New(layout.NewBorderLayout(nil, nil, idlabel, nil),
+		idlabel, identry)
+	subContents := container.NewVBox(idcontent)
+
+	paKeyentry := widget.NewEntryWithData(paAccessKeyBinding)
+	paKeylabel := widget.NewLabel("AccessKey:  ")
+	paKeycontent := container.New(layout.NewBorderLayout(nil, nil, paKeylabel, nil),
+		paKeylabel, paKeyentry)
+	subContents.Add(paKeycontent)
+
+	secKeyentry := widget.NewEntryWithData(paSecKeyBinding)
+	secKeylabel := widget.NewLabel("SecretKey:  ")
+	secKeycontent := container.New(layout.NewBorderLayout(nil, nil, secKeylabel, nil),
+		secKeylabel, secKeyentry)
+	subContents.Add(secKeycontent)
+
+	return subContents
 }

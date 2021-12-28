@@ -37,7 +37,7 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 	red := color.NRGBA{R: 0xff, G: 0x33, B: 0x33, A: 0xff}
 	errorLabel := canvas.NewText("", red)
 
-	testFunc := func (filePath string)  {
+	testFunc := func(filePath string) {
 		errorLabel.Text = ""
 
 		rulesetting := settings.NewRuleSettings()
@@ -57,8 +57,8 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 			errorLabel.Text = "failed to read book info." + err.Error()
 			return
 		}
-		resultStr := fmt.Sprintf("使用サービス:%s\n",appsetting.BookReader)
-		bookbind.Set(resultStr + getBookDisplayInfo(book))		
+		resultStr := fmt.Sprintf("使用サービス:%s\n", appsetting.BookReader)
+		bookbind.Set(resultStr + getBookDisplayInfo(book))
 	}
 
 	testPdfButton := widget.NewButton("Start Test(PDF)", func() {
@@ -83,7 +83,7 @@ func createCaption() *fyne.Container {
 		widget.NewLabel("Settingsタブの内容でテストを行います。(Saveボタンを押していない設定は使用されません。)"),
 		widget.NewLabel("GSやZbarのパスが正しく設定されているか確認できます。"),
 		widget.NewLabel("ファイルを差し替えれば自分のファイルでも確認可能です。"),
-		widget.NewLabel("PDF:  "+TestPDFFilePath+ "    Zip:  " + TestZIPFilePath),
+		widget.NewLabel("PDF:  "+TestPDFFilePath+"    Zip:  "+TestZIPFilePath),
 	)
 	return captions
 }

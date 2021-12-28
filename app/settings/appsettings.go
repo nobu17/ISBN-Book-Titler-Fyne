@@ -9,22 +9,30 @@ import (
 const AppSettingPath = "./app_setting.json"
 
 type AppSettings struct {
-	GSPath        string `json:"gsPath"`
-	ZBarPath      string `json:"zbarPath"`
-	ExtractPages  string `json:"extractPages"`
-	BookReader    string `json:"bookReader"`
-	RakutenApiKey string `json:"rakutenApiKey"`
-	json          *JsonSettings
+	GSPath           string `json:"gsPath"`
+	ZBarPath         string `json:"zbarPath"`
+	ExtractPages     string `json:"extractPages"`
+	BookReader       string `json:"bookReader"`
+	RakutenApiKey    string `json:"rakutenApiKey"`
+	AmazonPASettings AmazonPASettings
+	json             *JsonSettings
+}
+
+type AmazonPASettings struct {
+	AssociateId string `json:"associateId"`
+	AccessKey   string `json:"accessKey"`
+	SecretKey   string `json:"secretKey"`
 }
 
 func NewAppSetings() *AppSettings {
 	return &AppSettings{
-		GSPath:        "gs",
-		ZBarPath:      "zbarimg",
-		ExtractPages:  "5",
-		BookReader:    OpenBD.String(),
-		RakutenApiKey: "",
-		json:          NewJsonSettings(AppSettingPath),
+		GSPath:           "gs",
+		ZBarPath:         "zbarimg",
+		ExtractPages:     "5",
+		BookReader:       OpenBD.String(),
+		RakutenApiKey:    "",
+		AmazonPASettings: AmazonPASettings{"", "", ""},
+		json:             NewJsonSettings(AppSettingPath),
 	}
 }
 
@@ -34,6 +42,7 @@ const (
 	OpenBD BookInfoReaderType = iota
 	NationalLib
 	RakutenBook
+	AmazonPA
 )
 
 func (b BookInfoReaderType) String() string {
@@ -44,6 +53,8 @@ func (b BookInfoReaderType) String() string {
 		return "国会図書館"
 	case RakutenBook:
 		return "楽天ブックAPI"
+	case AmazonPA:
+		return "AmazonPA API"
 	default:
 		return "Unknown"
 	}
@@ -61,6 +72,7 @@ func (a *AppSettings) Init() {
 	a.ExtractPages = loaded.ExtractPages
 	a.BookReader = loaded.BookReader
 	a.RakutenApiKey = loaded.RakutenApiKey
+	a.AmazonPASettings = loaded.AmazonPASettings
 }
 
 func (a *AppSettings) SaveSetting() error {
@@ -102,6 +114,21 @@ func (a *AppSettings) Validate() error {
 		}
 	}
 
+	if a.BookReader == AmazonPA.String() {
+		if strings.TrimSpace(a.AmazonPASettings.AssociateId) == "" {
+			msg = "AmazonPA API is needed AssociateId"
+			return errors.New(msg)
+		}
+		if strings.TrimSpace(a.AmazonPASettings.AccessKey) == "" {
+			msg = "AmazonPA API is needed AccessKey"
+			return errors.New(msg)
+		}
+		if strings.TrimSpace(a.AmazonPASettings.SecretKey) == "" {
+			msg = "AmazonPA API is needed SecretKey"
+			return errors.New(msg)
+		}		
+	}
+
 	return nil
 }
 
@@ -120,5 +147,5 @@ func (a *AppSettings) GetSelectablePages() []string {
 }
 
 func (a *AppSettings) GetSelectableReader() []string {
-	return []string{OpenBD.String(), NationalLib.String(), RakutenBook.String()}
+	return []string{OpenBD.String(), NationalLib.String(), RakutenBook.String(), AmazonPA.String()}
 }

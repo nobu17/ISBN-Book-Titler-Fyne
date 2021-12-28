@@ -46,7 +46,9 @@ func getBookApi(setting *settings.AppSettings) (BookApi, error) {
 	case settings.NationalLib.String():
 		api = NewNationalLibReader()
 	case settings.RakutenBook.String():
-		api = NewRakutenReader(setting.RakutenApiKey);
+		api = NewRakutenReader(setting.RakutenApiKey)
+	case settings.AmazonPA.String():
+		api = NewAmazonPAReader(setting.AmazonPASettings.AssociateId, setting.AmazonPASettings.AccessKey, setting.AmazonPASettings.SecretKey)
 	}
 
 	if api != nil {
