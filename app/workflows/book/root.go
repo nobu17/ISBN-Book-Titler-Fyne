@@ -45,7 +45,10 @@ func getBookApi(setting *settings.AppSettings) (BookApi, error) {
 		api = NewOpenBDReader()
 	case settings.NationalLib.String():
 		api = NewNationalLibReader()
+	case settings.RakutenBook.String():
+		api = NewRakutenReader(setting.RakutenApiKey);
 	}
+
 	if api != nil {
 		return api, nil
 	}

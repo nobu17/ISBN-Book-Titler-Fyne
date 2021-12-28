@@ -72,7 +72,6 @@ type rakutenGenreData struct {
 	} `json:"parents"`
 }
 
-
 func NewRakutenReader(apikey string) *rakutenReader {
 	cli, _ := NewClient("https://app.rakuten.co.jp/services/api")
 	return &rakutenReader{
@@ -103,6 +102,7 @@ func (r *rakutenReader) GetBookInfo(isbn13 string) (*BookInfo, error) {
 
 func (r *rakutenReader) getBookInfoFromRakutenData(data *rakutenData) (*BookInfo, error) {
 	if data.Count == 0 || len(data.Items) == 0 {
+		logger.Error("not data from api", nil)
 		return nil, fmt.Errorf("no data from api")
 	}
 
@@ -120,7 +120,7 @@ func (r *rakutenReader) getBookInfoFromRakutenData(data *rakutenData) (*BookInfo
 
 	kind := item.Size
 	genre := r.getGenreString(item.BooksGenreID)
-	
+
 	return NewBookInfo(title, authors, publisher, pubdate, kind, genre), nil
 }
 
