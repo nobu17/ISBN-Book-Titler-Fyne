@@ -1,6 +1,7 @@
 package rename
 
 import (
+	"fmt"
 	"strings"
 
 	"isbnbook/app/workflows/book"
@@ -69,12 +70,32 @@ type authorsRule struct {
 
 func newAuthorRule() *authorsRule {
 	return &authorsRule{
-		replaceLogic: newReplaceLogic("a", "著者"),
+		replaceLogic: newReplaceLogic("a", "著者(複数時はカンマ区切り)"),
 	}
 }
 
 func (t *authorsRule) GetReplacedName(bookInfo *book.BookInfo, baseStr string) string {
 	return t.Replace(baseStr, strings.Join(bookInfo.Authors, ","))
+}
+
+type separateAuthorRule struct {
+}
+
+func newSeparateAuthorRule() *separateAuthorRule {
+	return &separateAuthorRule{}
+}
+
+func (t *separateAuthorRule) GetReplacedName(bookInfo *book.BookInfo, baseStr string) string {
+	replaced := baseStr
+	for i, author := range bookInfo.Authors {
+		replace := newReplaceLogic(fmt.Sprintf("a%d", i), "")
+		replaced = replace.Replace(replaced, author)
+	}
+	return replaced
+}
+
+func (r *separateAuthorRule) GetExplaination() string {
+	return "@[a(num)]:個別著者 (a0:1人目, a1:2人目...)"
 }
 
 type dateRule struct {

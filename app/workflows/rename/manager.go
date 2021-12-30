@@ -18,6 +18,7 @@ func newRenameManager() *renameManager {
 	rules := []RenameRule{}
 	rules = append(rules, newTitleRule())
 	rules = append(rules, newAuthorRule())
+	rules = append(rules, newSeparateAuthorRule())
 	rules = append(rules, newDateRule())
 	rules = append(rules, newPublisherRule())
 	rules = append(rules, newKindRule())
