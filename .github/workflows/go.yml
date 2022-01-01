@@ -25,17 +25,18 @@ jobs:
     - name: Get dependencies
       run: go get -v -t -d ./...
 
-    # - name: Build
-    #  run: go build -v ./...
+    - name: Build for Linux
+      run: |
+        mkdir ./linux_app
+        go build -v -o ./linux_app/app ./app/main.go
 
     - name: Build for Win
       env:
         goos: windows
         goarch: amd64 
       run: |
-        mkdir ./winapp
-        echo $PWD
-        go build -v -o ./winapp/app_win.exe ./app/main.go
+        mkdir ./win_app
+        go build -v -o ./win_app/app_win.exe ./app/main.go
         
           
           
