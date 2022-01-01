@@ -32,5 +32,5 @@ jobs:
       env:
         goos: windows
         goarch: amd64 
-      run: go build -v -o app_win.exe ./...
+      run: go build -v -o ./winapp/app_win.exe ./...
 
