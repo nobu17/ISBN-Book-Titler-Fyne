@@ -28,14 +28,13 @@ jobs:
     # - name: Build
     #  run: go build -v ./...
 
-    - name: MakeDir
-      run: mkdir ./winapp
-
     - name: Build for Win
       env:
         goos: windows
         goarch: amd64 
-        run: go build -v -o ./winapp/app_win.exe ./...
+      run: |
+        mkdir ./winapp
+        go build -v -o ./winapp/app_win.exe ./...
         
           
           
