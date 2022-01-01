@@ -27,24 +27,25 @@ jobs:
 
     - name: Build for Linux
       run: |
-        mkdir ./linux_app
-        go build -v -o ./linux_app/app ./app/main.go
+        mkdir ./dist
+        mkdir ./dist/linux_app
+        go build -v -o ./dist/linux_app/app ./app/main.go
 
     - name: Build for Win
       env:
         goos: windows
         goarch: amd64 
       run: |
-        mkdir ./win_app
-        go build -v -o ./win_app/app.exe ./app/main.go
+        mkdir ./dist/win_app
+        go build -v -o ./dist/win_app/app.exe ./app/main.go
 
     - name: Build for MacIntel
       env:
         goos: darwin
         goarch: amd64 
       run: |
-        mkdir ./mac_app
-        go build -v -o ./mac_app/app ./app/main.go
+        mkdir ./dist/mac_app
+        go build -v -o ./dist/mac_app/app ./app/main.go
           
           
 
