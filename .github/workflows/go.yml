@@ -36,8 +36,15 @@ jobs:
         goarch: amd64 
       run: |
         mkdir ./win_app
-        go build -v -o ./win_app/app_win.exe ./app/main.go
-        
+        go build -v -o ./win_app/app.exe ./app/main.go
+
+    - name: Build for MacIntel
+      env:
+        goos: darwin
+        goarch: amd64 
+      run: |
+        mkdir ./mac_app
+        go build -v -o ./mac_app/app ./app/main.go
           
           
 
