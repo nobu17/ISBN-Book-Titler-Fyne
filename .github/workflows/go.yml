@@ -28,3 +28,9 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: Build for Win
+      env:
+        goos: windows
+        goarch: amd64 
+      run: go build -v ./... -o app_win.exe
+
