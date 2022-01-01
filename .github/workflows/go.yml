@@ -34,7 +34,7 @@ jobs:
         goarch: amd64 
       run: |
         mkdir ./winapp
-        pwd
+        echo $PWD
         go build -v -o ./winapp/app_win.exe ./...
         
           
