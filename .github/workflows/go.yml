@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir ./winapp
           go build -v -o ./winapp/app_win.exe ./...
-        
+          
           
           
 
