@@ -1,0 +1,56 @@
+name: Go
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Get dependencies for Linux
+      run: sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libgl1-mesa-dev xorg-dev
+
+    - name: Get dependencies
+      run: go get -v -t -d ./...
+
+    - name: Build for Linux
+      run: |
+        mkdir ./dist
+        mkdir ./dist/linux_app
+        go build -v -o ./dist/linux_app/app ./app/main.go
+
+    - name: Build for Win
+      env:
+        goos: windows
+        goarch: amd64 
+      run: |
+        mkdir ./dist/win_app
+        go build -v -o ./dist/win_app/app.exe ./app/main.go
+
+    - name: Build for MacIntel
+      env:
+        goos: darwin
+        goarch: amd64 
+      run: |
+        mkdir ./dist/mac_app
+        go build -v -o ./dist/mac_app/app ./app/main.go
+          
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+           github_token: ${{ secrets.GITHUB_TOKEN }}
+           publish_dir: ./dist/
+           force_orphan: true          
+
