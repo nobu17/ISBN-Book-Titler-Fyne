@@ -24,13 +24,13 @@ func newRarExtractor(filePath string, pageOffset int) *rarExtractor {
 func (z rarExtractor) Extract(workDir string) error {
 	a, err := unarr.NewArchive(z.filePath)
 	if err != nil {
-		return fmt.Errorf("failed to extract rar:", err)
+		return fmt.Errorf("failed to extract rar:%s", err)
 	}
 	defer a.Close()
 
 	list, err := a.List()
 	if err != nil {
-		return fmt.Errorf("failed to read file list from rar:", err)
+		return fmt.Errorf("failed to read file list from rar:%s", err)
 	}
 	// sort by file names
 	sort.Slice(list, func(i, j int) bool { return list[i] < list[j] })
@@ -40,13 +40,13 @@ func (z rarExtractor) Extract(workDir string) error {
 		// extract zip files
 		for _, f := range list[pRange.start-1 : pRange.end-1] {
 			extractPath := filepath.Join(workDir, filepath.Base(f))
-			err := a.EntryFor(f);
+			err := a.EntryFor(f)
 			if err != nil {
-				return fmt.Errorf("failed to read entry:%s", err)		
+				return fmt.Errorf("failed to read entry:%s", err)
 			}
 			data, err := a.ReadAll()
 			if err != nil {
-				return fmt.Errorf("failed to read file:%s", err)		
+				return fmt.Errorf("failed to read file:%s", err)
 			}
 			if err = ioutil.WriteFile(extractPath, data, os.ModePerm); err != nil {
 				fmt.Println("write error", err)
