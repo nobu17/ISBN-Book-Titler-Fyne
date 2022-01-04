@@ -27,7 +27,6 @@ jobs:
 
     - name: Build for Linux
       run: |
-        mkdir ./dist
         mkdir ./dist/linux_app
         go build -v -o ./dist/linux_app/app ./app/main.go
 
