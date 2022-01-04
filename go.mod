@@ -5,6 +5,7 @@ go 1.17
 require fyne.io/fyne/v2 v2.1.1
 
 require (
+	github.com/gen2brain/go-unarr v0.1.2 // indirect
 	github.com/spiegel-im-spiegel/errs v1.0.5 // indirect
 	github.com/spiegel-im-spiegel/fetch v0.2.5 // indirect
 	github.com/spiegel-im-spiegel/pa-api v0.10.0 // indirect

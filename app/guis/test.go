@@ -16,8 +16,9 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const TestPDFFilePath = "./samples/test.pdf"
-const TestZIPFilePath = "./samples/test.zip"
+const testPDFFilePath = "./samples/test.pdf"
+const testZIPFilePath = "./samples/test.zip"
+const testRarFilePath = "./samples/test.rar"
 
 func GetTestContent(w *fyne.Window) *fyne.Container {
 
@@ -62,17 +63,21 @@ func GetTestContent(w *fyne.Window) *fyne.Container {
 	}
 
 	testPdfButton := widget.NewButton("Start Test(PDF)", func() {
-		testFunc(TestPDFFilePath)
+		testFunc(testPDFFilePath)
 	})
 	testZipButton := widget.NewButton("Start Test(Zip)", func() {
-		testFunc(TestZIPFilePath)
+		testFunc(testZIPFilePath)
 	})
+	testRarButton := widget.NewButton("Start Test(Rar)", func() {
+		testFunc(testRarFilePath)
+	})	
 
 	return container.NewVBox(
 		title,
 		captions,
 		testPdfButton,
 		testZipButton,
+		testRarButton,
 		errorLabel,
 		bookLabel,
 	)
@@ -83,7 +88,8 @@ func createCaption() *fyne.Container {
 		widget.NewLabel("Settingsタブの内容でテストを行います。(Saveボタンを押していない設定は使用されません。)"),
 		widget.NewLabel("GSやZbarのパスが正しく設定されているか確認できます。"),
 		widget.NewLabel("ファイルを差し替えれば自分のファイルでも確認可能です。"),
-		widget.NewLabel("PDF:  "+TestPDFFilePath+"    Zip:  "+TestZIPFilePath),
+		widget.NewLabel("PDF:  "+testPDFFilePath+"    Zip:  "+testZIPFilePath + "    Rar:"+testRarFilePath),
+		widget.NewLabel("RarファイルはRAR5形式に未対応です。"),
 	)
 	return captions
 }
