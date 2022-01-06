@@ -7,26 +7,34 @@ import (
 	"isbnbook/app/log"
 )
 
-var logger = log.GetLogger()
-
 const RuleSettingPath = "./rule_setting.json"
 
 type RuleSettings struct {
 	RenameRule string
-	json       *JsonSettings
+	json       FileStore
+	logger     log.AppLogger
 }
 
 func NewRuleSettings() *RuleSettings {
 	return &RuleSettings{
 		RenameRule: "(@[g])[@[a]]@[t]",
 		json: NewJsonSettings(RuleSettingPath),
+		logger: log.GetLogger(),
+	}
+}
+
+func NewRuleSettingsWithParam(fs FileStore, logger log.AppLogger) *RuleSettings {
+	return &RuleSettings{
+		RenameRule: "(@[g])[@[a]]@[t]",
+		json: fs,
+		logger: logger,
 	}
 }
 
 func (r *RuleSettings) Init() {
-	loaded := RuleSettings{}
-	if err := r.json.Load(&loaded); err != nil {
-		logger.Error("load json is failed.", err)
+	loaded := NewRuleSettings()
+	if err := r.json.Load(loaded); err != nil {
+		r.logger.Error("load json is failed.", err)
 		return
 	}
 	r.RenameRule = loaded.RenameRule

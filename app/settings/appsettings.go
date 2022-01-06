@@ -2,6 +2,7 @@ package settings
 
 import (
 	"errors"
+	"isbnbook/app/log"
 	"strconv"
 	"strings"
 )
@@ -15,7 +16,8 @@ type AppSettings struct {
 	BookReader       string `json:"bookReader"`
 	RakutenApiKey    string `json:"rakutenApiKey"`
 	AmazonPASettings AmazonPASettings
-	json             *JsonSettings
+	json             FileStore
+	logger           log.AppLogger
 }
 
 type AmazonPASettings struct {
@@ -33,6 +35,20 @@ func NewAppSetings() *AppSettings {
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"", "", ""},
 		json:             NewJsonSettings(AppSettingPath),
+		logger:           log.GetLogger(),
+	}
+}
+
+func NewAppSetingsWithParam(fs FileStore, logger log.AppLogger) *AppSettings {
+	return &AppSettings{
+		GSPath:           "gs",
+		ZBarPath:         "zbarimg",
+		ExtractPages:     "5",
+		BookReader:       OpenBD.String(),
+		RakutenApiKey:    "",
+		AmazonPASettings: AmazonPASettings{"", "", ""},
+		json:             fs,
+		logger:           logger,
 	}
 }
 
@@ -62,8 +78,8 @@ func (b BookInfoReaderType) String() string {
 
 func (a *AppSettings) Init() {
 	loaded := NewAppSetings()
-	if err := a.json.Load(&loaded); err != nil {
-		logger.Error("load json is failed.", err)
+	if err := a.json.Load(loaded); err != nil {
+		a.logger.Error("load json is failed.", err)
 		// works as default value
 		return
 	}
@@ -126,7 +142,7 @@ func (a *AppSettings) Validate() error {
 		if strings.TrimSpace(a.AmazonPASettings.SecretKey) == "" {
 			msg = "AmazonPA API is needed SecretKey"
 			return errors.New(msg)
-		}		
+		}
 	}
 
 	return nil

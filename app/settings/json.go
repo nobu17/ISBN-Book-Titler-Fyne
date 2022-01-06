@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+type FileStore interface {
+	Load(loadTarget interface{}) error
+	Save(saveTarge interface{}) error
+}
+
 type JsonSettings struct {
 	Path string
 }
