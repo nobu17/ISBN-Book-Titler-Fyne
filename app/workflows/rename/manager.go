@@ -26,10 +26,7 @@ func newRenameManager() *renameManager {
 	return &renameManager{&rules}
 }
 
-func (r *renameManager) Rename(path string, renameSetting *settings.RuleSettings, bookInfo *book.BookInfo) (string, error) {
-	extname := filepath.Ext(path)
-	dirname, _ := filepath.Split(path)
-
+func (r *renameManager) GetReplaceName(renameSetting *settings.RuleSettings, bookInfo *book.BookInfo) (string, error) {
 	replacedname := renameSetting.RenameRule
 	for _, rule := range *r.rules {
 		replacedname = rule.GetReplacedName(bookInfo, replacedname)
@@ -37,17 +34,29 @@ func (r *renameManager) Rename(path string, renameSetting *settings.RuleSettings
 	if len(strings.Trim(replacedname, "")) <= 0 {
 		return "", fmt.Errorf("replace name is empty")
 	}
-	replacedname += extname
-	renamePath := filepath.Join(dirname, replacedname)
+	return replacedname, nil
+}
+
+func (r *renameManager) Rename(path, newName string) (string, error) {
+	extname := filepath.Ext(path)
+	dirname, _ := filepath.Split(path)
+
+	newName += extname
+	renamePath := filepath.Join(dirname, newName)
 
 	if fileExists(renamePath) {
 		return "", fmt.Errorf("already file exists:%s", renamePath)
 	}
 
-	if err := os.Rename(path, renamePath); err != nil {
+	if err := renamefile(path, renamePath); err != nil {
 		return "", err
 	}
-	return replacedname, nil
+	return newName, nil
+}
+
+// for unit test
+var renamefile = func(oldPath, newPath string) error {
+	return os.Rename(oldPath, newPath)
 }
 
 func (r *renameManager) GetExplaination() string {
