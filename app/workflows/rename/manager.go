@@ -59,15 +59,15 @@ var renamefile = func(oldPath, newPath string) error {
 	return os.Rename(oldPath, newPath)
 }
 
+var fileExists = func(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil
+}
+
 func (r *renameManager) GetExplaination() string {
 	explanations := []string{}
 	for _, rule := range *r.rules {
 		explanations = append(explanations, rule.GetExplaination())
 	}
 	return strings.Join(explanations, "\n")
-}
-
-func fileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil
 }

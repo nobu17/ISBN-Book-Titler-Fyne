@@ -1,6 +1,7 @@
 package rename
 
 import (
+	"fmt"
 	"testing"
 
 	"isbnbook/app/settings"
@@ -47,8 +48,8 @@ func TestGetReplaceName_success(t *testing.T) {
 
 func TestGetReplaceName_failed(t *testing.T) {
 	type input struct {
-		rule     *settings.RuleSettings
-		book     *book.BookInfo
+		rule *settings.RuleSettings
+		book *book.BookInfo
 	}
 
 	inputs := []input{
@@ -65,8 +66,121 @@ func TestGetReplaceName_failed(t *testing.T) {
 	}
 }
 
+func TestRename_success(t *testing.T) {
+	newPathParam := ""
+	// mock file system IF
+	savedRenameFile := renamefile
+	defer func() { renamefile = savedRenameFile }()
+	renamefile = func(oldPath, newPath string) error {
+		newPathParam = newPath
+		return nil
+	}
+	savedFileExists := fileExists
+	defer func() { fileExists = savedFileExists }()
+	fileExists = func(filename string) bool {
+		return false
+	}
+
+	type input struct {
+		oldP         string
+		newP         string
+		expectedFile string
+		renamePath   string
+	}
+
+	inputs := []input{
+		{"old.pdf", "new", "new.pdf", "new.pdf"},
+		{"old.zip", "new", "new.zip", "new.zip"},
+		{"old.hoge.zip", "new", "new.zip", "new.zip"},
+		{"old", "new", "new", "new"},
+		{"dir/old.pdf", "new", "new.pdf", "dir/new.pdf"},
+	}
+
+	man := newRenameManager()
+
+	for _, p := range inputs {
+		actual, err := man.Rename(p.oldP, p.newP)
+		if err != nil {
+			t.Errorf("Rename result should not have error:%s", err)
+		}
+		if actual != p.expectedFile {
+			t.Errorf("Rename result should be:%s, actual:%s", p.expectedFile, actual)
+		}
+		if newPathParam != p.renamePath {
+			t.Errorf("Rename path should be:%s, actual:%s", p.renamePath, newPathParam)			
+		}
+	}
+}
+
+func TestRename_fileexists_failed(t *testing.T) {
+
+	// mock file system IF
+	savedRenameFile := renamefile
+	defer func() { renamefile = savedRenameFile }()
+	renamefile = func(oldPath, newPath string) error {
+		return nil
+	}
+	savedFileExists := fileExists
+	defer func() { fileExists = savedFileExists }()
+	fileExists = func(filename string) bool {
+		return true
+	}
+
+	type input struct {
+		oldP     string
+		newP     string
+	}
+
+	inputs := []input{
+		{"old.pdf", "new"},
+	}
+
+	man := newRenameManager()
+
+	for _, p := range inputs {
+		_, err := man.Rename(p.oldP, p.newP)
+		if err == nil {
+			t.Errorf("Rename result should not have error")
+		}
+	}
+}
+
+
+func TestRename_renamefile_failed(t *testing.T) {
+
+	// mock file system IF
+	savedRenameFile := renamefile
+	defer func() { renamefile = savedRenameFile }()
+	renamefile = func(oldPath, newPath string) error {
+		return fmt.Errorf("error")
+	}
+	savedFileExists := fileExists
+	defer func() { fileExists = savedFileExists }()
+	fileExists = func(filename string) bool {
+		return false
+	}
+
+	type input struct {
+		oldP     string
+		newP     string
+	}
+
+	inputs := []input{
+		{"old.pdf", "new"},
+	}
+
+	man := newRenameManager()
+
+	for _, p := range inputs {
+		_, err := man.Rename(p.oldP, p.newP)
+		if err == nil {
+			t.Errorf("Rename result should not have error")
+		}
+	}
+}
+
 func TestGetExplaination(t *testing.T) {
-	expected := "@[t]:タイトル\n@[a]:著者(複数時はカンマ区切り)\n@[a(num)]:個別著者 (a0:1人目, a1:2人目...)\n@[d]:出版年月\n@[p]:出版社\n@[k]:出版種類(単行本など)\n@[g]:ジャンル" 
+	expected := "@[t]:タイトル\n@[a]:著者(複数時はカンマ区切り)\n@[a(num)]:個別著者 (a0:1人目, a1:2人目...)\n@[d]:出版年月\n@[p]:出版社\n@[k]:出版種類(単行本など)\n@[g]:ジャンル"
 	man := newRenameManager()
 
 	actual := man.GetExplaination()
