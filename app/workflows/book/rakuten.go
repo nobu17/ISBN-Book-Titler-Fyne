@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"isbnbook/app/log"
+	"isbnbook/app/repos"
 )
 
 type rakutenReader struct {
 	apikey string
-	client *client
+	client repos.Client
+	logger log.AppLogger
 }
 
 type rakutenData struct {
@@ -73,10 +77,12 @@ type rakutenGenreData struct {
 }
 
 func NewRakutenReader(apikey string) *rakutenReader {
-	cli, _ := NewClient("https://app.rakuten.co.jp/services/api")
+	cli, _ := repos.NewClient("https://app.rakuten.co.jp/services/api")
+	log := log.GetLogger()
 	return &rakutenReader{
 		apikey: apikey,
 		client: cli,
+		logger: log,
 	}
 }
 
@@ -100,7 +106,7 @@ func (r *rakutenReader) GetBookInfo(isbn13 string) (*BookInfo, error) {
 
 func (r *rakutenReader) getBookInfoFromRakutenData(data *rakutenData) (*BookInfo, error) {
 	if data.Count == 0 || len(data.Items) == 0 {
-		logger.Error("not data from api", nil)
+		r.logger.Error("not data from api", nil)
 		return nil, fmt.Errorf("no data from api")
 	}
 

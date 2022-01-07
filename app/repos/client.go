@@ -1,34 +1,39 @@
-package book
+package repos
 
 import (
-	"isbnbook/app/log"
-
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
+
+	"isbnbook/app/log"
 )
 
-type client struct {
-	BaseURL    *url.URL
-	HTTPClient *http.Client
+type Client interface {
+	Get(url string, params map[string]string) ([]byte, error)
 }
 
-func NewClient(baseUrl string) (*client, error) {
+type httpClient struct {
+	BaseURL    *url.URL
+	HTTPClient *http.Client
+	logger     log.AppLogger
+}
+
+func NewClient(baseUrl string) (Client, error) {
 	baseURL, err := url.Parse(baseUrl)
 	if err != nil {
 		return nil, err
 	}
-	return &client{
+	log := log.GetLogger()
+	return &httpClient{
 		BaseURL:    baseURL,
 		HTTPClient: http.DefaultClient,
+		logger:     log,
 	}, nil
 }
 
-var logger = log.GetLogger()
-
-func (c *client) Get(url string, params map[string]string) ([]byte, error) {
+func (c *httpClient) Get(url string, params map[string]string) ([]byte, error) {
 	copiedURL := *c.BaseURL
 	copiedURL.Path = path.Join(copiedURL.Path, url)
 	q := copiedURL.Query()
@@ -36,7 +41,7 @@ func (c *client) Get(url string, params map[string]string) ([]byte, error) {
 		q.Add(k, v)
 	}
 	copiedURL.RawQuery = q.Encode()
-	logger.Info(fmt.Sprintf("call url:%s", copiedURL.String()))
+	c.logger.Info(fmt.Sprintf("call url:%s", copiedURL.String()))
 	resp, err := c.HTTPClient.Get(copiedURL.String())
 	if err != nil {
 		return nil, err

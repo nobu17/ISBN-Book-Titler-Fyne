@@ -3,10 +3,12 @@ package book
 import (
 	"encoding/xml"
 	"strings"
+
+	"isbnbook/app/repos"
 )
 
 type nationalLibReader struct {
-	client *client
+	client repos.Client
 }
 
 type nationalLibData struct {
@@ -207,7 +209,7 @@ var ndCodeList = map[string]string{
 }
 
 func NewNationalLibReader() *nationalLibReader {
-	cli, _ := NewClient("http://iss.ndl.go.jp/api")
+	cli, _ := repos.NewClient("http://iss.ndl.go.jp/api")
 	return &nationalLibReader{
 		client: cli,
 	}

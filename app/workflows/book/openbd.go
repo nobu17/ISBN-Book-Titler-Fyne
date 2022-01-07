@@ -2,10 +2,12 @@ package book
 
 import (
 	"encoding/json"
+
+	"isbnbook/app/repos"
 )
 
 type openBDReader struct {
-	client *client
+	client repos.Client
 }
 
 type openBDData struct {
@@ -187,7 +189,7 @@ var openBDCodes = map[string]string{
 }
 
 func NewOpenBDReader() *openBDReader {
-	cli, _ := NewClient("https://api.openbd.jp/v1")
+	cli, _ := repos.NewClient("https://api.openbd.jp/v1")
 	return &openBDReader{
 		client: cli,
 	}
