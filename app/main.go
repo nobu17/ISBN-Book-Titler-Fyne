@@ -24,32 +24,40 @@ type menu struct {
 func createMenus(w *fyne.Window, files []string) *[]menu {
 	menuItems := make([]menu, 0)
 
-	settings := guis.GetSettingContent()
+	// setting
+	settings := guis.NewSettingDisplay()
 	settingMenu := menu{"Settings", theme.SettingsIcon(), func() *fyne.Container {
-		return settings
+		return settings.Display(w, nil)
 	}}
 	menuItems = append(menuItems, settingMenu)
 
 	// rule
-	rule := guis.GetRuleContent()
+	rule := guis.NewRuleDisplay()
 	ruleMenu := menu{"Rules", theme.DocumentIcon(), func() *fyne.Container {
-		return rule
+		return rule.Display(w, nil)
 	}}
 	menuItems = append(menuItems, ruleMenu)
 
 	// test
-	test := guis.GetTestContent(w)
+	test := guis.NewTestDisplay()
 	testMenu := menu{"Test", theme.CancelIcon(), func() *fyne.Container {
-		return test
+		return test.Display(w, nil)
 	}}
 	menuItems = append(menuItems, testMenu)
 
 	// results
-	result := guis.GetResultContent(w, files)
+	result := guis.NewResultsDisplay()
 	resultMenu := menu{"Results", theme.ComputerIcon(), func() *fyne.Container {
-		return result
+		return result.Display(w, files)
 	}}
 	menuItems = append(menuItems, resultMenu)
+
+	// version
+	version := guis.NewVersionDisplay()
+	versionMenu := menu{"Version", theme.DownloadIcon(), func() *fyne.Container {
+		return version.Display(w, nil)
+	}}
+	menuItems = append(menuItems, versionMenu)
 
 	return &menuItems
 }

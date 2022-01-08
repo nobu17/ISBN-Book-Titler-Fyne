@@ -119,3 +119,7 @@ func (v *Version) Validate() error {
 	}
 	return nil
 }
+
+func (v *Version) String() string {
+	return fmt.Sprintf("%d.%d.%d", v.Main, v.Mainor, v.Patch)
+}

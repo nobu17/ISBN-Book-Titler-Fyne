@@ -71,3 +71,21 @@ func TestGetLatest_failed(t *testing.T) {
 		}
 	}
 }
+
+func TestVersionString(t *testing.T) {
+
+	tables := map[Version]string{
+		{0, 0, 0}: "0.0.0",
+		{1, 0, 0}: "1.0.0",
+		{0, 1, 0}: "0.1.0",
+		{0, 0, 1}: "0.0.1",
+		{1, 2, 3}: "1.2.3",
+	}
+
+	for ver, exp := range tables {
+		act := ver.String()
+		if act != exp {
+			t.Errorf("Version string should be:%s, act:%s", exp, act)
+		}
+	}
+}

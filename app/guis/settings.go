@@ -15,7 +15,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func GetSettingContent() *fyne.Container {
+func getSettingContent() *fyne.Container {
 	appSetting := *settings.NewAppSetings()
 	appSetting.Init()
 

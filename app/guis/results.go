@@ -19,7 +19,7 @@ var data = [][]string{
 
 type taskCallback func([]workflows.WorkFlowResult)
 
-func GetResultContent(w *fyne.Window, files []string) *fyne.Container {
+func getResultContent(w *fyne.Window, files []string) *fyne.Container {
 
 	title := widget.NewLabel("Results")
 	title.Alignment = fyne.TextAlignCenter

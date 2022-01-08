@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
-	
+
 	"isbnbook/app/settings"
 	"isbnbook/app/workflows/rename"
 	"isbnbook/app/log"
@@ -16,7 +16,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func GetRuleContent() *fyne.Container {
+func getRuleContent() *fyne.Container {
 	logger := log.GetLogger()
 
 	rule := *settings.NewRuleSettings()

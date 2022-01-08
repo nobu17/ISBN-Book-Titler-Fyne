@@ -20,7 +20,7 @@ const testPDFFilePath = "./samples/test.pdf"
 const testZIPFilePath = "./samples/test.zip"
 const testRarFilePath = "./samples/test.rar"
 
-func GetTestContent(w *fyne.Window) *fyne.Container {
+func getTestContent(w *fyne.Window) *fyne.Container {
 
 	title := widget.NewLabel("Test")
 	title.Alignment = fyne.TextAlignCenter
