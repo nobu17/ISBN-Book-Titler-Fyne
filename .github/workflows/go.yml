@@ -24,11 +24,15 @@ jobs:
 
     - name: Get dependencies
       run: go get -v -t -d ./...
+      
+    - name: Get fyne
+      run: go get fyne.io/fyne/v2/cmd/fyne
 
     - name: Build for Linux
       run: |
         mkdir ./dist/linux_app
-        go build -v -o ./dist/linux_app/app ./app/main.go
+        fyne package -os linux -executable ./dist/linux_app/app -sourceDir ./app/main.go
+        # go build -v -o ./dist/linux_app/app ./app/main.go
 
     - name: Build for Win
       env:
