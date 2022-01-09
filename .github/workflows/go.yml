@@ -25,10 +25,10 @@ jobs:
     - name: Get dependencies
       run: go get -v -t -d ./...
 
-    #- name: Build for Linux
-    #  run: |
-    #    mkdir ./dist/linux_app
-    #    go build -v -o ./dist/linux_app/app ./app/main.go
+    - name: Build for Linux
+      run: |
+        mkdir ./dist/linux_app
+        go build -v -o ./dist/linux_app/app ./app/main.go
 
     - name: Build for Win
       env:
