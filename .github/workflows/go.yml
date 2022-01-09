@@ -26,7 +26,7 @@ jobs:
       run: go get -v -t -d ./...
       
     - name: Get fyne
-      run: go get fyne.io/fyne/v2/cmd/fyne
+      run: go get -d fyne.io/fyne/v2/cmd/fyne
 
     - name: Build for Linux
       run: |
