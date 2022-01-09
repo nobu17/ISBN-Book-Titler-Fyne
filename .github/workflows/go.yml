@@ -31,8 +31,8 @@ jobs:
     - name: Build for Linux
       run: |
         mkdir ./dist/linux_app
-        echo $GOBIN
-        ls -R $GOBIN
+        echo $GOPATH
+        ls -R $GOPATH
         $GOPATH/bin/fyne package -os linux -executable ./dist/linux_app/app -sourceDir ./app/main.go
         # go build -v -o ./dist/linux_app/app ./app/main.go
 
