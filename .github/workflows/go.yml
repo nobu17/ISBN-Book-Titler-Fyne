@@ -20,15 +20,15 @@ jobs:
         go-version: 1.17
 
     - name: Get dependencies for Linux
-      run: sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libgl1-mesa-dev xorg-dev
+      run: sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libgl1-mesa-dev xorg-dev gcc-multilib gcc-mingw-w64 binutils-mingw-w64
 
     - name: Get dependencies
       run: go get -v -t -d ./...
 
-    - name: Build for Linux
-      run: |
-        mkdir ./dist/linux_app
-        go build -v -o ./dist/linux_app/app ./app/main.go
+    #- name: Build for Linux
+    #  run: |
+    #    mkdir ./dist/linux_app
+    #    go build -v -o ./dist/linux_app/app ./app/main.go
 
     - name: Build for Win
       env:
