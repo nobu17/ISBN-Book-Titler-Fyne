@@ -39,7 +39,7 @@ jobs:
         # CXX: x86_64-w64-mingw32-g++
       run: |
         mkdir ./dist/win_app
-        go build -v -o ./dist/win_app/app.exe ./app/main.go
+        GOOS=windows GOARCH=amd64 go build -v -o ./dist/win_app/app.exe ./app/main.go
         # go build -ldflags="-H windowsgui" -v -o ./dist/win_app/app.exe ./app/main.go
 
     - name: Build for MacIntel
