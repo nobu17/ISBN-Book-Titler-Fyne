@@ -13,6 +13,7 @@ type AppSettings struct {
 	GSPath           string `json:"gsPath"`
 	ZBarPath         string `json:"zbarPath"`
 	ExtractPages     string `json:"extractPages"`
+	RenameOption     string `json:"renameOption"`
 	BookReader       string `json:"bookReader"`
 	RakutenApiKey    string `json:"rakutenApiKey"`
 	AmazonPASettings AmazonPASettings
@@ -31,6 +32,7 @@ func NewAppSetings() *AppSettings {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       OpenBD.String(),
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"", "", ""},
@@ -44,6 +46,7 @@ func NewAppSetingsWithParam(fs FileStore, logger log.AppLogger) *AppSettings {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       OpenBD.String(),
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"", "", ""},
@@ -76,6 +79,24 @@ func (b BookInfoReaderType) String() string {
 	}
 }
 
+type RenameOption int
+
+const (
+	Copy RenameOption = iota
+	Rename
+)
+
+func (b RenameOption) String() string {
+	switch b {
+	case Copy:
+		return "コピーしてリネーム"
+	case Rename:
+		return "既存ファイルをリネーム"
+	default:
+		return "Unknown"
+	}
+}
+
 func (a *AppSettings) Init() {
 	loaded := NewAppSetings()
 	if err := a.json.Load(loaded); err != nil {
@@ -86,6 +107,7 @@ func (a *AppSettings) Init() {
 	a.GSPath = loaded.GSPath
 	a.ZBarPath = loaded.ZBarPath
 	a.ExtractPages = loaded.ExtractPages
+	a.RenameOption = loaded.RenameOption
 	a.BookReader = loaded.BookReader
 	a.RakutenApiKey = loaded.RakutenApiKey
 	a.AmazonPASettings = loaded.AmazonPASettings
@@ -160,6 +182,10 @@ func (a *AppSettings) GetPagesInt() int {
 
 func (a *AppSettings) GetSelectablePages() []string {
 	return []string{"1", "2", "3", "4", "5", "6", "7"}
+}
+
+func (a *AppSettings) GetSelectableRenames() []string {
+	return []string{Copy.String(), Rename.String()}
 }
 
 func (a *AppSettings) GetSelectableReader() []string {

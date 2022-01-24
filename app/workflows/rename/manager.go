@@ -37,7 +37,7 @@ func (r *renameManager) GetReplaceName(renameSetting *settings.RuleSettings, boo
 	return replacedname, nil
 }
 
-func (r *renameManager) Rename(path, newName string) (string, error) {
+func (r *renameManager) Rename(path, newName string, appSetting *settings.AppSettings) (string, error) {
 	extname := filepath.Ext(path)
 	dirname, _ := filepath.Split(path)
 
@@ -48,15 +48,15 @@ func (r *renameManager) Rename(path, newName string) (string, error) {
 		return "", fmt.Errorf("already file exists:%s", renamePath)
 	}
 
-	if err := renamefile(path, renamePath); err != nil {
+	renamer, err := getRenamer(appSetting)
+	if err != nil {
+		return "", err
+	}
+
+	if err := renamer.Rename(path, renamePath); err != nil {
 		return "", err
 	}
 	return newName, nil
-}
-
-// for unit test
-var renamefile = func(oldPath, newPath string) error {
-	return os.Rename(oldPath, newPath)
 }
 
 var fileExists = func(filename string) bool {

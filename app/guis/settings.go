@@ -33,6 +33,7 @@ func getSettingContent() *fyne.Container {
 	gsPathEntry := makeGSPathEntry(&appSetting)
 	zbarPathEntry := makeZBarPathEntry(&appSetting)
 	pageSelect := makePageSelect(&appSetting)
+	renameSelect := makeRenameSelect(&appSetting)
 	readerSelect := makeReaderSelect(&appSetting)
 
 	form := &widget.Form{
@@ -40,6 +41,7 @@ func getSettingContent() *fyne.Container {
 			{Text: "GS パス", Widget: gsPathEntry},
 			{Text: "ZBar パス", Widget: zbarPathEntry},
 			{Text: "展開ページ数", Widget: pageSelect},
+			{Text: "リネーム設定", Widget: renameSelect},
 			{Text: "利用サービス", Widget: readerSelect},
 		},
 		SubmitText: "Save",
@@ -92,6 +94,16 @@ func makePageSelect(setting *settings.AppSettings) *widget.Select {
 		binding.Set(s)
 	})
 	sel.SetSelected(setting.ExtractPages)
+	return sel
+}
+
+func makeRenameSelect(setting *settings.AppSettings) *widget.Select {
+	binding := binding.BindString(&setting.RenameOption)
+	selectables := setting.GetSelectableRenames()
+	sel := widget.NewSelect(selectables, func(s string) {
+		binding.Set(s)
+	})
+	sel.SetSelected(setting.RenameOption)
 	return sel
 }
 

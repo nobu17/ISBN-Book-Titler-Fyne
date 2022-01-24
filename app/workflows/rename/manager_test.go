@@ -1,7 +1,7 @@
 package rename
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"isbnbook/app/settings"
@@ -12,6 +12,11 @@ var createRule = func(renamRule string) *settings.RuleSettings {
 	r := settings.NewRuleSettingsWithParam(nil, nil)
 	r.RenameRule = renamRule
 	return r
+}
+
+var createAppSetting = func() *settings.AppSettings {
+	a := settings.NewAppSetingsWithParam(nil, nil)
+	return a
 }
 
 func TestGetReplaceName_success(t *testing.T) {
@@ -66,14 +71,32 @@ func TestGetReplaceName_failed(t *testing.T) {
 	}
 }
 
+type MockRenamer struct {
+	err  error
+	src  string
+	dist string
+}
+
+func (m *MockRenamer) Rename(src, dist string) error {
+	m.src = src
+	m.dist = dist
+	if m.err != nil {
+		return m.err
+	}
+	return nil
+}
+
+func NewMockRenamer(err error) *MockRenamer {
+	return &MockRenamer{err, "", ""}
+}
+
 func TestRename_success(t *testing.T) {
-	newPathParam := ""
 	// mock file system IF
-	savedRenameFile := renamefile
-	defer func() { renamefile = savedRenameFile }()
-	renamefile = func(oldPath, newPath string) error {
-		newPathParam = newPath
-		return nil
+	mockRenamer := NewMockRenamer(nil)
+	savedGetRenamer := getRenamer
+	defer func() { getRenamer = savedGetRenamer }()
+	getRenamer = func(appSetting *settings.AppSettings) (fileRenamer, error) {
+		return mockRenamer, nil
 	}
 	savedFileExists := fileExists
 	defer func() { fileExists = savedFileExists }()
@@ -99,26 +122,26 @@ func TestRename_success(t *testing.T) {
 	man := newRenameManager()
 
 	for _, p := range inputs {
-		actual, err := man.Rename(p.oldP, p.newP)
+		actual, err := man.Rename(p.oldP, p.newP, createAppSetting())
 		if err != nil {
 			t.Errorf("Rename result should not have error:%s", err)
 		}
 		if actual != p.expectedFile {
 			t.Errorf("Rename result should be:%s, actual:%s", p.expectedFile, actual)
 		}
-		if newPathParam != p.renamePath {
-			t.Errorf("Rename path should be:%s, actual:%s", p.renamePath, newPathParam)			
+		if mockRenamer.dist != p.renamePath {
+			t.Errorf("Rename path should be:%s, actual:%s", p.renamePath, mockRenamer.dist)
 		}
 	}
 }
 
-func TestRename_fileexists_failed(t *testing.T) {
-
+func TestRename_filexists_failed(t *testing.T) {
 	// mock file system IF
-	savedRenameFile := renamefile
-	defer func() { renamefile = savedRenameFile }()
-	renamefile = func(oldPath, newPath string) error {
-		return nil
+	mockRenamer := NewMockRenamer(nil)
+	savedGetRenamer := getRenamer
+	defer func() { getRenamer = savedGetRenamer }()
+	getRenamer = func(appSetting *settings.AppSettings) (fileRenamer, error) {
+		return mockRenamer, nil
 	}
 	savedFileExists := fileExists
 	defer func() { fileExists = savedFileExists }()
@@ -127,8 +150,8 @@ func TestRename_fileexists_failed(t *testing.T) {
 	}
 
 	type input struct {
-		oldP     string
-		newP     string
+		oldP string
+		newP string
 	}
 
 	inputs := []input{
@@ -138,21 +161,20 @@ func TestRename_fileexists_failed(t *testing.T) {
 	man := newRenameManager()
 
 	for _, p := range inputs {
-		_, err := man.Rename(p.oldP, p.newP)
+		_, err := man.Rename(p.oldP, p.newP, createAppSetting())
 		if err == nil {
 			t.Errorf("Rename result should not have error")
 		}
 	}
 }
 
-
 func TestRename_renamefile_failed(t *testing.T) {
-
 	// mock file system IF
-	savedRenameFile := renamefile
-	defer func() { renamefile = savedRenameFile }()
-	renamefile = func(oldPath, newPath string) error {
-		return fmt.Errorf("error")
+	mockRenamer := NewMockRenamer(errors.New(""))
+	savedGetRenamer := getRenamer
+	defer func() { getRenamer = savedGetRenamer }()
+	getRenamer = func(appSetting *settings.AppSettings) (fileRenamer, error) {
+		return mockRenamer, nil
 	}
 	savedFileExists := fileExists
 	defer func() { fileExists = savedFileExists }()
@@ -161,8 +183,8 @@ func TestRename_renamefile_failed(t *testing.T) {
 	}
 
 	type input struct {
-		oldP     string
-		newP     string
+		oldP string
+		newP string
 	}
 
 	inputs := []input{
@@ -172,7 +194,7 @@ func TestRename_renamefile_failed(t *testing.T) {
 	man := newRenameManager()
 
 	for _, p := range inputs {
-		_, err := man.Rename(p.oldP, p.newP)
+		_, err := man.Rename(p.oldP, p.newP, createAppSetting())
 		if err == nil {
 			t.Errorf("Rename result should not have error")
 		}

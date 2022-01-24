@@ -50,7 +50,7 @@ func (w *RenameByBookInfoWorkflow) RenameFileByIsbn(path string) *WorkFlowResult
 		return &WorkFlowResult{"", path, "Get Bookinfo Error", err}
 	}
 
-	newname, err := rename.Rename(path, w.ruleSetings, info)
+	newname, err := rename.Rename(path, w.appSettings, w.ruleSetings, info)
 	if err != nil {
 		logger.Error("Rename file Error", err)
 		return &WorkFlowResult{"", path, "Rename file Error", err}

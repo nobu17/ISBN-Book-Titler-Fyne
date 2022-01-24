@@ -21,6 +21,19 @@ func TestBookInfoReaderType_String(t *testing.T) {
 	}
 }
 
+func TestRenameOption_String(t *testing.T) {
+	tables := map[RenameOption]string{
+		Copy:   "コピーしてリネーム",
+		Rename: "既存ファイルをリネーム",
+		4:      "Unknown",
+	}
+	for k, v := range tables {
+		if k.String() != v {
+			t.Errorf("String is expected:%s, actual;%s", v, k.String())
+		}
+	}
+}
+
 func prepareAppSettings(mockData AppSettings, err error) *AppSettings {
 	mockStore := newMockFileStore(&mockData, err)
 
@@ -40,6 +53,9 @@ func assertAppSettings(expected, actual *AppSettings, t *testing.T) {
 	if actual.ExtractPages != expected.ExtractPages {
 		t.Errorf("ExtractPages should be:{%s}, actual:{%s}", expected.ExtractPages, actual.ExtractPages)
 	}
+	if actual.RenameOption != expected.RenameOption {
+		t.Errorf("RenameOption should be:{%s}, actual:{%s}", expected.RenameOption, actual.RenameOption)
+	}
 	if actual.RakutenApiKey != expected.RakutenApiKey {
 		t.Errorf("RakutenApiKey should be:{%s}, actual:{%s}", expected.RakutenApiKey, actual.RakutenApiKey)
 	}
@@ -49,11 +65,13 @@ func assertAppSettings(expected, actual *AppSettings, t *testing.T) {
 }
 
 func TestAppSettings_Init_Success(t *testing.T) {
+	// these value should be overwritten
 	mockData := AppSettings{}
 	mockData.GSPath = "gsp"
 	mockData.ZBarPath = "zbbb"
 	mockData.BookReader = "reader"
 	mockData.ExtractPages = "1"
+	mockData.RenameOption = "renameop"
 	mockData.RakutenApiKey = "key"
 	mockData.AmazonPASettings = AmazonPASettings{"Id", "Key", "SecKey"}
 
@@ -68,6 +86,7 @@ func TestAppSettings_Init_Failed(t *testing.T) {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       OpenBD.String(),
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"", "", ""},
@@ -93,6 +112,7 @@ func TestAppSettings_Validate_BookReader_Success(t *testing.T) {
 			GSPath:           "gs",
 			ZBarPath:         "zbarimg",
 			ExtractPages:     "5",
+			RenameOption:     Copy.String(),
 			BookReader:       reader.String(),
 			RakutenApiKey:    "key",
 			AmazonPASettings: AmazonPASettings{"Id", "Key", "SecKey"},
@@ -111,6 +131,7 @@ func TestAppSettings_Validate_BookReader_Failed(t *testing.T) {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       "err",
 		RakutenApiKey:    "key",
 		AmazonPASettings: AmazonPASettings{"Id", "Key", "SecKey"},
@@ -128,6 +149,7 @@ func TestAppSettings_Validate_BookReader_RakutenApi_Failed(t *testing.T) {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       RakutenBook.String(),
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"Id", "Key", "SecKey"},
@@ -156,13 +178,14 @@ func TestAppSettings_Validate_BookReader_AmazonPA_Failed(t *testing.T) {
 			GSPath:           "gs",
 			ZBarPath:         "zbarimg",
 			ExtractPages:     "5",
+			RenameOption:     Copy.String(),
 			BookReader:       AmazonPA.String(),
 			RakutenApiKey:    "",
 			AmazonPASettings: pa,
 			json:             nil,
 			logger:           nil,
 		}
-	
+
 		if err := app.Validate(); err == nil {
 			t.Errorf("should hasve error when AmazonPASetting some values are empty:{%s}", pa)
 		}
@@ -171,22 +194,23 @@ func TestAppSettings_Validate_BookReader_AmazonPA_Failed(t *testing.T) {
 
 func TestAppSettings_GetPagesInt(t *testing.T) {
 	tables := map[string]int{
-		"1" : 1,
-		"5" : 5,
-		"a" : 5, //default 
+		"1": 1,
+		"5": 5,
+		"a": 5, //default
 	}
 	for k, v := range tables {
 		app := AppSettings{
 			GSPath:           "gs",
 			ZBarPath:         "zbarimg",
 			ExtractPages:     k,
+			RenameOption:     Copy.String(),
 			BookReader:       AmazonPA.String(),
 			RakutenApiKey:    "",
 			AmazonPASettings: AmazonPASettings{"Id", "Key", "SecKey"},
 			json:             nil,
 			logger:           nil,
 		}
-	
+
 		if v != app.GetPagesInt() {
 			t.Errorf("GetPagesInt should be:%d when ExtractPage is:%s", v, k)
 		}
@@ -200,6 +224,7 @@ func TestAppSettings_GetSelectablePages(t *testing.T) {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       RakutenBook.String(),
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"Id", "Key", "SecKey"},
@@ -220,6 +245,7 @@ func TestAppSettings_GetSelectableReader(t *testing.T) {
 		GSPath:           "gs",
 		ZBarPath:         "zbarimg",
 		ExtractPages:     "5",
+		RenameOption:     Copy.String(),
 		BookReader:       RakutenBook.String(),
 		RakutenApiKey:    "",
 		AmazonPASettings: AmazonPASettings{"Id", "Key", "SecKey"},

@@ -50,6 +50,7 @@ func (m *mockFileStore) Load(loadTarget interface{}) error {
 			value.ZBarPath = app.ZBarPath
 			value.BookReader = app.BookReader
 			value.ExtractPages = app.ExtractPages
+			value.RenameOption = app.RenameOption
 			value.RakutenApiKey = app.RakutenApiKey
 			value.AmazonPASettings = app.AmazonPASettings
 		} else {
