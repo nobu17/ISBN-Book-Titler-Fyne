@@ -5,6 +5,7 @@ import (
 	"isbnbook/app/guis"
 	"isbnbook/app/log"
 	mytheme "isbnbook/app/theme"
+	"isbnbook/app/utils"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -65,6 +66,14 @@ func createMenus(w *fyne.Window, files []string) *[]menu {
 func main() {
 	logger := log.GetLogger()
 	logger.Info("start app")
+
+	// change work dir
+	err := utils.ChangeWorkDir()
+	if err != nil {
+		logger.Error("failed to init change work dir", err)
+		return
+	}
+
 	// get file or dir from drag and drop
 	files, failed, err := command.GetFiles()
 	if err != nil {

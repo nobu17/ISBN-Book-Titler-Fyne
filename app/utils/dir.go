@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"isbnbook/app/log"
 
@@ -61,4 +62,36 @@ func MkDirIfNotExists(path string) error {
 		}
 	}
 	return nil
+}
+
+func ChangeWorkDir() error {
+	// if on go run command, not change dir
+	if RunningThroughGoRun() {
+		return nil
+	}
+	ex, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("failed to get exeutable's dir err:%s", err)
+	}
+	exPath := filepath.Dir(ex)
+	fmt.Println("change dir:", exPath)
+	err = os.Chdir(exPath)
+	if err != nil {
+		return fmt.Errorf("failed to change work dir err:%s", err)
+	}
+	return nil
+}
+
+func RunningThroughGoRun() bool {
+	executable, err := os.Executable()
+	if err != nil {
+		return false
+	}
+
+	goTmpDir := os.Getenv("GOTMPDIR")
+	if goTmpDir != "" {
+		return strings.HasPrefix(executable, goTmpDir)
+	}
+
+	return strings.HasPrefix(executable, os.TempDir())
 }
