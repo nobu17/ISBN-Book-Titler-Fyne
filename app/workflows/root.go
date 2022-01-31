@@ -40,20 +40,20 @@ func (w *RenameByBookInfoWorkflow) RenameFileByIsbn(path string) *WorkFlowResult
 	isbnflow := isbn.NewIsbnGetWorkFlow(w.appSettings)
 	isbn13, err := isbnflow.GetIsbn(path, int(w.appSettings.GetPagesInt()))
 	if err != nil {
-		logger.Error("Get ISBN Error", err)
-		return &WorkFlowResult{"", path, "Get ISBN Error", err}
+		logger.Error("Get ISBN Error. err:", err)
+		return &WorkFlowResult{"", path, "Get ISBN Error:", err}
 	}
 
 	info, err := book.GetBookInfo(isbn13, w.appSettings)
 	if err != nil {
-		logger.Error("Get Bookinfo Error", err)
-		return &WorkFlowResult{"", path, "Get Bookinfo Error", err}
+		logger.Error("Get Bookinfo Error. err:", err)
+		return &WorkFlowResult{"", path, "Get Bookinfo Error:", err}
 	}
 
 	newname, err := rename.Rename(path, w.appSettings, w.ruleSetings, info)
 	if err != nil {
-		logger.Error("Rename file Error", err)
-		return &WorkFlowResult{"", path, "Rename file Error", err}
+		logger.Error("Rename file Error. err:", err)
+		return &WorkFlowResult{"", path, "Rename file Error:", err}
 	}
 	return &WorkFlowResult{newname, path, "", nil}
 }
