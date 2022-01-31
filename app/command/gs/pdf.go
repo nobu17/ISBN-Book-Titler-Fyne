@@ -26,11 +26,12 @@ func (g *GSPdfReader) GetPageCount(filePath string) (int, error) {
 	command := exec.Command(g.toolPath, "-q", "-dNOSAFER", "-dNODISPLAY", "-c", commandstr)
 	// set file dir
 	command.Dir = filepath.Dir(filePath)
+	logger.Info("work dir;" + command.Dir)
 	logger.Info(command.String())
 	out, err := command.CombinedOutput()
 
 	if err != nil {
-		logger.Error("GetPageCount Error", err)
+		logger.Error("GetPageCount Error. err:", err)
 		return 0, err
 	}
 	num, err := strconv.Atoi(strings.TrimSpace(string(out)))
