@@ -1,6 +1,8 @@
 package log
 
 import (
+	"isbnbook/app/utils"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -15,6 +17,9 @@ type zapLogger struct {
 }
 
 func initLogger() *zap.SugaredLogger {
+
+	// change work dir as app dir for logging
+	utils.ChangeWorkDir()
 
 	level := zap.NewAtomicLevel()
 	level.SetLevel(zapcore.DebugLevel)

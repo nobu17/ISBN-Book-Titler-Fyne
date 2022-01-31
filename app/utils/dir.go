@@ -8,12 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"isbnbook/app/log"
-
 	"github.com/google/uuid"
 )
-
-var logger = log.GetLogger()
 
 func GetFilesFromDir(dir string, extension string) ([]string, error) {
 	files, err := ioutil.ReadDir(dir)
@@ -48,17 +44,15 @@ func MkUniqueDir(baseDir string) (string, error) {
 }
 
 func MkDirIfNotExists(path string) error {
-	logger.Info(fmt.Sprintf("make dir:%s", path))
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		fmt.Println("try to make")
 		err = os.Mkdir(path, os.ModePerm)
 		if err != nil {
-			logger.Error("failed to create", err)
-			return err
+			return fmt.Errorf("failed to create. err:%s", err)
 		}
 		err = os.Chmod(path, 0777)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to change permission. err:%s", err)
 		}
 	}
 	return nil
@@ -69,17 +63,24 @@ func ChangeWorkDir() error {
 	if RunningThroughGoRun() {
 		return nil
 	}
-	ex, err := os.Executable()
+	exPath, err := GetAppDir()
 	if err != nil {
-		return fmt.Errorf("failed to get exeutable's dir err:%s", err)
+		return err
 	}
-	exPath := filepath.Dir(ex)
-	fmt.Println("change dir:", exPath)
+
 	err = os.Chdir(exPath)
 	if err != nil {
 		return fmt.Errorf("failed to change work dir err:%s", err)
 	}
 	return nil
+}
+
+func GetAppDir() (string, error) {
+	ex, err := os.Executable()
+	if err != nil {
+		return "", fmt.Errorf("failed to get exeutable's dir err:%s", err)
+	}
+	return filepath.Dir(ex), nil
 }
 
 func RunningThroughGoRun() bool {
