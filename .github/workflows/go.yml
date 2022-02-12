@@ -19,6 +19,9 @@ jobs:
       with:
         go-version: 1.17
 
+    - name: Update package
+      run: sudo apt-get apt-get update
+
     - name: Get dependencies for Linux
       run: sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libgl1-mesa-dev xorg-dev mingw-w64
 
