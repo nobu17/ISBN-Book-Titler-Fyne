@@ -2,6 +2,7 @@ package book
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"isbnbook/app/repos"
 )
@@ -207,6 +208,9 @@ func (o *openBDReader) GetBookInfo(isbn13 string) (*BookInfo, error) {
 
 	if err := json.Unmarshal(byteArray, &data); err != nil {
 		return nil, err
+	}
+	if len(data) == 0 {
+		return nil, fmt.Errorf("get book api result is null or empty. maybe not existed book info")
 	}
 	return o.getBookInfoFromBDData(data[0])
 }
