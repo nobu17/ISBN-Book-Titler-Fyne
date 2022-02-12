@@ -36,6 +36,7 @@ func TestGetReplaceName_success(t *testing.T) {
 		{createRule("(@[g])"), book.NewBookInfo("タイトル", []string{"著者1", "著者2"}, "出版社A", "2021-12", "単行本", "技術書"), "(技術書)"},
 		{createRule("(@[t])(@[a])(@[a0])(@[a1])(@[p])(@[d])(@[k])(@[g])"), book.NewBookInfo("タイトル", []string{"著者1", "著者2"}, "出版社A", "2021-12", "単行本", "技術書"), "(タイトル)(著者1,著者2)(著者1)(著者2)(出版社A)(2021-12)(単行本)(技術書)"},
 		{createRule("(そのまま)"), book.NewBookInfo("タイトル", []string{"著者1", "著者2"}, "出版社A", "2021-12", "単行本", "技術書"), "(そのまま)"},
+		{createRule("(@[t])"), book.NewBookInfo("タ:イトル/", []string{"著者1", "著者2"}, "出版社A", "2021-12", "単行本", "技術書"), "(タ_イトル_)"},
 	}
 
 	man := newRenameManager()

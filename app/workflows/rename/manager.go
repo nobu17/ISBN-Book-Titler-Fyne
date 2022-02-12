@@ -34,7 +34,7 @@ func (r *renameManager) GetReplaceName(renameSetting *settings.RuleSettings, boo
 	if len(strings.Trim(replacedname, "")) <= 0 {
 		return "", fmt.Errorf("replace name is empty")
 	}
-	return replacedname, nil
+	return replaceForbiddenName(replacedname), nil
 }
 
 func (r *renameManager) Rename(path, newName string, appSetting *settings.AppSettings) (string, error) {
