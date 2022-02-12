@@ -18,7 +18,7 @@
 go.work
 
 # app
-samples/
+samples/*
 *.log
 *.pdf
 *.zip
@@ -28,3 +28,8 @@ app_setting.json
 
 temp_work/*
 !.gitkeep
+!dist/samples/*
+
+
+
+
