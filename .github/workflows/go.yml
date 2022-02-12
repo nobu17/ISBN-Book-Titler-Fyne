@@ -33,7 +33,7 @@ jobs:
         mkdir ./dist/linux_app
         go build -v -o ./dist/linux_app/app ./app/main.go
         cp ./dist/readme.txt ./dist/linux_app/
-        cp ./dist/samples ./dist/linux_app/
+        cp -r ./dist/samples ./dist/linux_app/
 
     - name: Build for Win
       env:
@@ -46,7 +46,7 @@ jobs:
         mkdir ./dist/win_app
         GGOARCH=amd64 GOOS=windows CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 go build -v -o ./dist/win_app/app.exe ./app/main.go
         cp ./dist/readme.txt ./dist/win_app/
-        cp ./dist/samples ./dist/win_app/
+        cp -r ./dist/samples ./dist/win_app/
         # go build -ldflags="-H windowsgui" -v -o ./dist/win_app/app.exe ./app/main.go
 
     - name: Build for MacIntel
@@ -57,7 +57,7 @@ jobs:
         mkdir ./dist/mac_app
         go build -v -o ./dist/mac_app/app.app ./app/main.go
         cp ./dist/readme.txt ./dist/mac_app/
-        cp ./dist/samples ./dist/mac_app/
+        cp -r ./dist/samples ./dist/mac_app/
           
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
