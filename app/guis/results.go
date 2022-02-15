@@ -40,7 +40,7 @@ func getResultContent(w *fyne.Window, files []string) *fyne.Container {
 	if len(files) > 0 {
 		diag := NewWaitDialog(w)
 		diag.Show()
-		go execueWorkFlow(files, diag, func(result []workflows.WorkFlowResult) {
+		go executeWorkFlow(files, diag, func(result []workflows.WorkFlowResult) {
 			updateTable(result, table)
 			diag.Hide()
 		})
@@ -49,7 +49,7 @@ func getResultContent(w *fyne.Window, files []string) *fyne.Container {
 	return content
 }
 
-func execueWorkFlow(files []string, diag dialog.Dialog, cb taskCallback) {
+func executeWorkFlow(files []string, diag dialog.Dialog, cb taskCallback) {
 	appsetting := settings.NewAppSetings()
 	appsetting.Init()
 
