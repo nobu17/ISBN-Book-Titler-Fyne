@@ -41,19 +41,19 @@ func (w *RenameByBookInfoWorkflow) RenameFileByIsbn(path string) *WorkFlowResult
 	isbn13, err := isbnflow.GetIsbn(path, int(w.appSettings.GetPagesInt()))
 	if err != nil {
 		logger.Error("Get ISBN Error. err:", err)
-		return &WorkFlowResult{"", path, "Get ISBN Error:", err}
+		return &WorkFlowResult{"", path, "ISBN情報取得エラー:", err}
 	}
 
 	info, err := book.GetBookInfo(isbn13, w.appSettings)
 	if err != nil {
 		logger.Error("Get Bookinfo Error. err:", err)
-		return &WorkFlowResult{"", path, "Get Bookinfo Error:", err}
+		return &WorkFlowResult{"", path, "書籍情報取得エラー:", err}
 	}
 
 	newname, err := rename.Rename(path, w.appSettings, w.ruleSetings, info)
 	if err != nil {
 		logger.Error("Rename file Error. err:", err)
-		return &WorkFlowResult{"", path, "Rename file Error:", err}
+		return &WorkFlowResult{"", path, "ファイルリネームエラー:", err}
 	}
 	return &WorkFlowResult{newname, path, "", nil}
 }
@@ -73,19 +73,19 @@ func (w *RenameByBookInfoWorkflow) TestGetBookInfo(path string) (*book.BookInfo,
 
 func (w *RenameByBookInfoWorkflow) preCheck(path string) *WorkFlowResult {
 	if err := w.appSettings.Validate(); err != nil {
-		errmsg := "appsetting is incorect"
+		errmsg := "アプリ設定不正"
 		logger.Error(errmsg, err)
 		return &WorkFlowResult{"", path, errmsg, err}
 	}
 	if err := w.ruleSetings.Validate(); err != nil {
-		errmsg := "ruleSetings is incorect"
+		errmsg := "リネーム設定不正"
 		logger.Error(errmsg, err)
 		return &WorkFlowResult{"", path, errmsg, err}
 	}
 
 	if !w.isFileExists(path) {
 		logger.Error("file is not exists", nil)
-		return &WorkFlowResult{"", path, "file is not exists", fmt.Errorf("file is not exists")}
+		return &WorkFlowResult{"", path, "ファイルが存在しません。", fmt.Errorf("file is not exists")}
 	}
 	return nil
 }
