@@ -28,7 +28,7 @@ func getVersionContent(w *fyne.Window) *fyne.Container {
 	latestLabel := widget.NewLabelWithData(latestBind)
 	latestLabel.Alignment = fyne.TextAlignCenter
 
-	url ,_ := url.Parse("https://github.com/nobu17/ISBN-Book-Titler-Fyne")
+	url ,_ := url.Parse("https://github.com/nobu17/ISBN-Book-Titler-Fyne/releases")
 	link := widget.NewHyperlink("最新版をDLする", url)
 
 	testFunc := func() {
