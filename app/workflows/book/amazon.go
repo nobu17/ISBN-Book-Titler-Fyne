@@ -3,6 +3,7 @@ package book
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"isbnbook/app/utils"
 
@@ -30,6 +31,51 @@ func NewAmazonPAReader(associateId, accessKey, secrectKey string) *amazonPAReade
 }
 
 func (a *amazonPAReader) GetBookInfo(isbn13 string) (*BookInfo, error) {
+	if strings.HasPrefix(isbn13, "978") {
+		return a.getBookInfoFromIsbn13(isbn13)
+	}
+	return a.getBookInfoFromEan13(isbn13)
+}
+
+func (a *amazonPAReader) getBookInfoFromEan13(ean13 string) (*BookInfo, error) {
+	asin, err := a.getASINFromEan13(ean13)
+	if err != nil {
+		return nil, err
+	}
+	q := query.NewGetItems(a.client.Marketplace(), a.client.PartnerTag(), a.client.PartnerType()).
+		ASINs([]string{*asin}).
+		EnableItemInfo().
+		EnableBrowseNodeInfo()
+
+	body, err := a.client.Request(q)
+	if err != nil {
+		return nil, err
+	}
+	res, err := entity.DecodeResponse(body)
+	if err != nil {
+		return nil, err
+	}
+	return a.getBookInfoFromPAData(res)
+}
+
+func (a *amazonPAReader) getASINFromEan13(ean13 string) (*string, error) {
+	q := query.NewSearchItems(a.client.Marketplace(), a.client.PartnerTag(), a.client.PartnerType()).
+		Search(query.Keywords, ean13).
+		EnableItemInfo().
+		EnableBrowseNodeInfo()
+
+	body, err := a.client.Request(q)
+	if err != nil {
+		return nil, err
+	}
+	res, err := entity.DecodeResponse(body)
+	if err != nil {
+		return nil, err
+	}
+	return a.getAsinFromSearchData(res)
+}
+
+func (a *amazonPAReader) getBookInfoFromIsbn13(isbn13 string) (*BookInfo, error) {
 	// convert to isbn10
 	isbn10, err := utils.ConvertToISBN10(isbn13)
 	if err != nil {
@@ -80,4 +126,15 @@ func (a *amazonPAReader) getBookInfoFromPAData(data *entity.Response) (*BookInfo
 	}
 
 	return NewBookInfo(title, authors, publisher, pubdate, kind, genre), nil
+}
+
+func (a *amazonPAReader) getAsinFromSearchData(data *entity.Response) (*string, error) {
+	if data.Errors != nil && len(data.Errors) > 0 {
+		return nil, fmt.Errorf(data.Errors[0].Message)
+	}
+	if data.SearchResult == nil || data.SearchResult.Items == nil || len(data.SearchResult.Items) < 1 {
+		return nil, fmt.Errorf("no result")
+	}
+	item := data.SearchResult.Items[0]
+	return &item.ASIN, nil
 }

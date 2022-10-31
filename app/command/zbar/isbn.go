@@ -16,7 +16,9 @@ func NewZBarReader(toolPath string) *ZBarReader {
 	return &ZBarReader{toolPath}
 }
 
-var isbnHeader = "ISBN-13:"
+const isbnHeader = "ISBN-13:"
+const eanCheckHeader = "EAN-13:491" // magazine code
+const eanHeader = "EAN-13:"
 
 func (z *ZBarReader) GetIsbnFromImage(imagePath string) (string, error) {
 	// fmt.Println("command:::", z.toolPath + " -Sisbn13.enable " + imagePath)	
@@ -25,16 +27,20 @@ func (z *ZBarReader) GetIsbnFromImage(imagePath string) (string, error) {
 		// fmt.Println(err)
 		return "", err
 	}
-	isbn := ""
+	code := ""
 	for i, v := range regexp.MustCompile("\r\n|\n\r|\n|\r").Split(string(out), -1) {
 		fmt.Println(i+1, ":", v)
 		if strings.HasPrefix(v, isbnHeader) {
-			isbn = strings.Replace(v, isbnHeader, "", -1)
+			code = strings.Replace(v, isbnHeader, "", -1)
 			break
 		}
+		if strings.HasPrefix(v, eanCheckHeader) {
+			code = strings.Replace(v, eanHeader, "", -1)
+			// try check to isbn is exists
+		}
 	}
-	if isbn == "" {
-		return isbn, errors.New("scanning ISBN code is failed")
+	if code == "" {
+		return code, errors.New("scanning ISBN(or EAN 491) code is failed")
 	}
-	return isbn, nil
+	return code, nil
 }
