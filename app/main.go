@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"isbnbook/app/command"
 	"isbnbook/app/guis"
 	"isbnbook/app/log"
 	mytheme "isbnbook/app/theme"
 	"isbnbook/app/utils"
+
+	"runtime/debug"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -66,6 +69,13 @@ func createMenus(w *fyne.Window, files []string) *[]menu {
 func main() {
 	logger := log.GetLogger()
 	logger.Info("start app")
+
+    defer func() {
+        if r := recover(); r != nil {
+			msg := fmt.Sprintf("Panic. %v\nStack:\n%s", r, debug.Stack())
+            logger.Info(msg)
+        }
+    }()
 
 	// change work dir
 	err := utils.ChangeWorkDir()
