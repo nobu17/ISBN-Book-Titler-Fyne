@@ -107,25 +107,44 @@ func (a *amazonPAReader) getBookInfoFromPAData(data *entity.Response) (*BookInfo
 	}
 	item := data.ItemsResult.Items[0]
 
-	title := item.ItemInfo.Title.DisplayValue
-	publisher := item.ItemInfo.ByLineInfo.Manufacturer.DisplayValue
-	pubdate := item.ItemInfo.ContentInfo.PublicationDate.DisplayValue.Time.Format("2006-01-02")
+	title := ""
+	if item.ItemInfo.Title != nil {
+		title = item.ItemInfo.Title.DisplayValue
+	}
+
+	publisher := ""
+	if item.ItemInfo.ByLineInfo != nil && item.ItemInfo.ByLineInfo.Manufacturer != nil {
+		publisher = item.ItemInfo.ByLineInfo.Manufacturer.DisplayValue
+	}
+
+	pubDate := ""
+	if item.ItemInfo.ContentInfo != nil {
+		pubDate = item.ItemInfo.ContentInfo.PublicationDate.DisplayValue.Time.Format("2006-01-02")
+	}
 
 	var authors []string
-	for _, cont := range item.ItemInfo.ByLineInfo.Contributors {
-		authors = append(authors, cont.Name)
-	}
-	kind := item.ItemInfo.Classifications.Binding.DisplayValue
-	genre := ""
-
-	for _, node := range item.BrowseNodeInfo.BrowseNodes {
-		if node.DisplayName != "" {
-			genre = node.DisplayName
-			break
+	if item.ItemInfo.ByLineInfo != nil {
+		for _, cont := range item.ItemInfo.ByLineInfo.Contributors {
+			authors = append(authors, cont.Name)
 		}
 	}
 
-	return NewBookInfo(title, authors, publisher, pubdate, kind, genre), nil
+	kind := ""
+	if item.ItemInfo.Classifications != nil {
+		kind = item.ItemInfo.Classifications.Binding.DisplayValue
+	}
+
+	genre := ""
+	if item.BrowseNodeInfo != nil {
+		for _, node := range item.BrowseNodeInfo.BrowseNodes {
+			if node.DisplayName != "" {
+				genre = node.DisplayName
+				break
+			}
+		}
+	}
+
+	return NewBookInfo(title, authors, publisher, pubDate, kind, genre), nil
 }
 
 func (a *amazonPAReader) getAsinFromSearchData(data *entity.Response) (*string, error) {
